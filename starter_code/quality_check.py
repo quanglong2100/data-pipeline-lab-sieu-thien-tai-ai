@@ -1,15 +1,14 @@
-# ==========================================
-# ROLE 3: OBSERVABILITY & QA ENGINEER
-# ==========================================
-
 def run_semantic_checks(doc_dict: dict) -> bool:
     content = doc_dict.get("content", "")
     
-    # 1. Kiểm tra độ dài: Nếu content trống hoặc < 10 ký tự -> False
-    # TODO: Thực hiện kiểm tra độ dài ở đây
+    # 1. Kiểm tra độ dài: Nếu content trống hoặc < 10 ký tự -> Loại
+    if not content or len(content) < 10:
+        return False
     
-    # 2. Kiểm tra từ khóa lỗi
+    # 2. Kiểm tra từ khóa lỗi (Toxic/Corrupt content)
     toxic_keywords = ["Null pointer exception", "OCR Error", "Traceback"]
-    # TODO: Lặp qua các từ trong toxic_keywords, nếu từ đó xuất hiện trong content -> Trả về False
+    for word in toxic_keywords:
+        if word.lower() in content.lower():
+            return False
             
     return True

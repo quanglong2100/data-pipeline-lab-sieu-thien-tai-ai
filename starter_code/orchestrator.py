@@ -1,8 +1,6 @@
 import os
 import json
 import glob
-
-# Import các thành phần
 from schema import UnifiedDocument
 from process_unstructured import process_pdf_data, process_video_data
 from quality_check import run_semantic_checks
@@ -24,10 +22,12 @@ def run_pipeline():
         with open(file_path, 'r') as f:
             raw_data = json.load(f)
         
-        # TODO: Bước 1: Gọi hàm xử lý PDF (process_pdf_data)
+        # Bước 1: Xử lý raw data
+        processed_doc = process_pdf_data(raw_data)
         
-        # TODO: Bước 2: Kiểm tra chất lượng (run_semantic_checks). 
-        # Nếu đạt (True) thì thêm vào list final_kb
+        # Bước 2: Kiểm tra chất lượng
+        if run_semantic_checks(processed_doc):
+            final_kb.append(processed_doc)
 
     # Xử lý Group B (Videos)
     video_files = glob.glob(os.path.join(RAW_DATA_DIR, "group_b_videos", "*.json"))
@@ -35,12 +35,18 @@ def run_pipeline():
         with open(file_path, 'r') as f:
             raw_data = json.load(f)
         
-        # TODO: Làm tương tự như phần PDF (gọi hàm xử lý Video và kiểm tra chất lượng)
+        # Bước 1: Xử lý raw data
+        processed_doc = process_video_data(raw_data)
+        
+        # Bước 2: Kiểm tra chất lượng
+        if run_semantic_checks(processed_doc):
+            final_kb.append(processed_doc)
 
-    # Lưu kết quả
-    with open(OUTPUT_FILE, 'w') as f:
-        json.dump(final_kb, f, indent=4)
-        print(f"Pipeline finished! Saved {len(final_kb)} records.")
+    # Lưu kết quả cuối cùng
+    with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
+        json.dump(final_kb, f, indent=4, ensure_ascii=False)
+        print(f"Pipeline finished! Processed: {len(pdf_files) + len(video_files)} files.")
+        print(f"Successfully ingested to KB: {len(final_kb)} records.")
 
 if __name__ == "__main__":
     run_pipeline()
